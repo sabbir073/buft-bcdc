@@ -7,6 +7,13 @@ import { board9, subExecutive9, board7, ExecutiveBoard } from "@/data/executives
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+interface Member {
+  id: number;
+  name: string;
+  position: string;
+  image: string;
+}
+
 const boards = [
   { id: "board-9", label: "9th Executive Board", data: board9 },
   { id: "sub-executive-9", label: "Sub-Executive Board 9.0", data: subExecutive9 },
@@ -15,8 +22,19 @@ const boards = [
 
 export default function ExecutiveBoardPage() {
   const [activeBoard, setActiveBoard] = useState<string>("board-9");
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const currentBoard = boards.find((b) => b.id === activeBoard)?.data as ExecutiveBoard;
+
+  const openModal = (member: Member) => {
+    setSelectedMember(member);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeModal = () => {
+    setSelectedMember(null);
+    document.body.style.overflow = "auto";
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
@@ -121,7 +139,8 @@ export default function ExecutiveBoardPage() {
             {currentBoard.members.map((member) => (
               <div
                 key={member.id}
-                className="group relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                onClick={() => openModal(member)}
+                className="group relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
               >
                 {/* Image Container */}
                 <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
@@ -133,7 +152,15 @@ export default function ExecutiveBoardPage() {
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                   {/* Gradient Overlay on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                    <div className="text-white flex items-center gap-1 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className="font-medium">View</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Bottom decorative border */}
@@ -164,6 +191,59 @@ export default function ExecutiveBoardPage() {
           </Link>
         </div>
       </section>
+
+      {/* Modal Popup */}
+      {selectedMember && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 overflow-y-auto"
+          onClick={closeModal}
+        >
+          {/* Modal Content */}
+          <div
+            className="relative rounded-2xl overflow-hidden shadow-2xl w-full max-w-sm sm:max-w-md my-auto transform transition-all animate-modal-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 text-white transition-colors cursor-pointer"
+              aria-label="Close modal"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Image */}
+            <div className="relative aspect-[3/4] bg-gradient-to-br from-blue-50 to-gray-100">
+              <Image
+                src={selectedMember.image}
+                alt={selectedMember.name}
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Animation Style */}
+          <style jsx>{`
+            @keyframes modal-in {
+              from {
+                opacity: 0;
+                transform: scale(0.95);
+              }
+              to {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+            .animate-modal-in {
+              animation: modal-in 0.2s ease-out forwards;
+            }
+          `}</style>
+        </div>
+      )}
 
       <Footer />
     </main>

@@ -112,9 +112,9 @@ export default function PublicationsPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 pt-20">
+      <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-20 relative overflow-hidden">
+        <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 pt-32 pb-20 relative overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />

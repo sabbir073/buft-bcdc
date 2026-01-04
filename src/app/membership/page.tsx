@@ -17,25 +17,17 @@ export default function MembershipPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const benefits = [
     {
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>
       ),
-      title: "Exclusive Job & Internship Access",
-      description: "Get priority access to internship and job opportunities from our industry partner companies before they are publicly posted.",
-    },
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      ),
-      title: "Career Workshops & Seminars",
-      description: "Attend exclusive workshops on resume building, interview skills, personal branding, and professional development.",
+      title: "Career-Focused Training",
+      description: "Participate in workshops and seminars on CV writing, interview preparation, and professional etiquette to enhance your employability.",
     },
     {
       icon: (
@@ -43,17 +35,35 @@ export default function MembershipPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
-      title: "Networking Opportunities",
-      description: "Connect with industry professionals, alumni, and peers through our networking events and professional meetups.",
+      title: "Event & Leadership Experience",
+      description: "Collaborate with board members on organizing national career fests, enhancing teamwork, management, and leadership skills.",
     },
     {
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
         </svg>
       ),
-      title: "Mentorship Program",
-      description: "Get paired with experienced mentors from the industry who will guide you in your career journey.",
+      title: "Industry Networking",
+      description: "Connect directly with alumni, recruiters, and industry experts to build professional relationships that last a lifetime.",
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      ),
+      title: "Access to Opportunities",
+      description: "Stay updated on internships, scholarships, and career openings in the textile and apparel industry before they go public.",
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+      title: "Skill & Personal Development",
+      description: "Strengthen communication, critical thinking, and creative skills through active participation in projects and presentations.",
     },
     {
       icon: (
@@ -61,17 +71,8 @@ export default function MembershipPage() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
         </svg>
       ),
-      title: "Certificates & Recognition",
-      description: "Earn certificates for participation in events and activities to enhance your portfolio and resume.",
-    },
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      ),
-      title: "Resource Library Access",
-      description: "Access our exclusive library of career resources, templates, guides, and industry reports.",
+      title: "Career Preparation",
+      description: "Gain confidence, improve employability, and prepare for diverse career paths in the textile and apparel industry.",
     },
   ];
 
@@ -154,7 +155,7 @@ export default function MembershipPage() {
                 Become a <span className="text-blue-600">BCDC Member</span>
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                Join the largest career-focused community at BUFT and unlock exclusive opportunities, resources, and connections to accelerate your career.
+                Join the largest career-focused community at BUFT and unlock exclusive opportunities for professional growth. Recruitment opens once a year during the spring semester.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <a
@@ -435,32 +436,55 @@ export default function MembershipPage() {
               <div className="w-20 h-1 bg-blue-600 mx-auto rounded-full" />
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
                 {
                   question: "Who can join BCDC?",
                   answer: "Any current student of BGMEA University of Fashion & Technology (BUFT) can join BCDC. We welcome students from all departments and batches."
                 },
                 {
+                  question: "When does recruitment happen?",
+                  answer: "Recruitment for new general members typically happens once a year during the spring semester. Stay connected with us on social media to get updates about the next recruitment drive."
+                },
+                {
                   question: "Is there a membership fee?",
                   answer: "No, BCDC membership is completely free for all BUFT students. We believe career development opportunities should be accessible to everyone."
                 },
                 {
-                  question: "How long does the application process take?",
-                  answer: "We typically review applications within 3-5 business days. You will receive an email notification once your application is approved."
-                },
-                {
                   question: "What are the responsibilities of a member?",
-                  answer: "Members are encouraged to actively participate in events, workshops, and activities. Active participation helps you get the most out of your membership."
+                  answer: "Members are encouraged to actively participate in events, workshops, and activities. Active participation helps you get the most out of your membership and develop leadership skills."
                 },
                 {
                   question: "Can I become a volunteer or executive member?",
-                  answer: "Yes! After becoming a general member, you can apply for volunteer or executive positions when openings are announced. These positions offer additional leadership opportunities."
+                  answer: "Yes! After becoming a general member, you can apply for volunteer or executive positions when openings are announced. These positions offer additional leadership opportunities and hands-on experience in event management."
+                },
+                {
+                  question: "What skills will I develop as a member?",
+                  answer: "Members develop communication, critical thinking, teamwork, and leadership skills through active participation in projects, presentations, and event organization."
                 }
               ].map((faq, index) => (
-                <div key={index} className="bg-gray-50 rounded-2xl p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
-                  <p className="text-gray-600">{faq.answer}</p>
+                <div
+                  key={index}
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm"
+                >
+                  <button
+                    onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                    className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
+                    <h3 className="text-lg font-bold text-gray-900 pr-4">{faq.question}</h3>
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center transition-transform duration-300 ${openFaq === index ? "rotate-180" : ""}`}>
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                      openFaq === index ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <p className="px-6 pb-6 text-gray-600 leading-relaxed">{faq.answer}</p>
+                  </div>
                 </div>
               ))}
             </div>
