@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "BCDC - BUFT Career Development Club",
   description: "Step Towards Sustainable Career - BUFT Career Development Club, a dedicated & strongest career-concern community at BGMEA University of Fashion & Technology.",
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
 };
 
 export default function RootLayout({
