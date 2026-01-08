@@ -30,7 +30,7 @@ export default function InterviewTipsPage() {
   useEffect(() => {
     async function fetchTips() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://buftcdc.com";
         const response = await fetch(`${baseUrl}/api/public/interview-tips`, {
           cache: "no-store",
         });

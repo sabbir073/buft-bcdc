@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -320,7 +323,7 @@ export default function ActivitiesPage() {
     async function fetchActivities() {
       setLoading(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
         const params = new URLSearchParams({
           limit: ITEMS_PER_PAGE.toString(),
           offset: '0',
@@ -362,7 +365,7 @@ export default function ActivitiesPage() {
   const loadMore = async () => {
     setLoadingMore(true);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
       const params = new URLSearchParams({
         limit: ITEMS_PER_PAGE.toString(),
         offset: offset.toString(),

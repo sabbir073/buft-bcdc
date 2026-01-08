@@ -160,7 +160,7 @@ export default function CareerResourcesPage() {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
         const response = await fetch(`${baseUrl}/api/public/job-posts`, {
           cache: 'no-store',
         });
@@ -183,7 +183,7 @@ export default function CareerResourcesPage() {
   useEffect(() => {
     async function fetchTemplates() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
         const response = await fetch(`${baseUrl}/api/public/cv-templates`, {
           cache: 'no-store',
         });
@@ -206,7 +206,7 @@ export default function CareerResourcesPage() {
   useEffect(() => {
     async function fetchInterviewTips() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
         const response = await fetch(`${baseUrl}/api/public/interview-tips`, {
           cache: 'no-store',
         });
@@ -229,7 +229,7 @@ export default function CareerResourcesPage() {
   useEffect(() => {
     async function fetchCareerGuidelines() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
         const response = await fetch(`${baseUrl}/api/public/career-guidelines?limit=3`, {
           cache: 'no-store',
         });
@@ -252,7 +252,7 @@ export default function CareerResourcesPage() {
   useEffect(() => {
     async function fetchSuccessStories() {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
         const response = await fetch(`${baseUrl}/api/public/success-stories?limit=4`, {
           cache: 'no-store',
         });

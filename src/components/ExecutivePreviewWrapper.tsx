@@ -9,7 +9,7 @@ interface Member {
 
 async function getLatestBoard(): Promise<Member[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://buftcdc.com';
     const response = await fetch(`${baseUrl}/api/public/executives`, {
       cache: 'no-store',
     });

@@ -49,13 +49,13 @@ npm install
 npm run dev
 
 # Open browser
-http://localhost:3000
+https://buftcdc.com
 ```
 
 ### First Login
 
 ```
-URL: http://localhost:3000/admin/login
+URL: https://buftcdc.com/admin/login
 Username: admin
 Password: admin123
 ```
@@ -83,24 +83,24 @@ Password: admin123
 ### Test Database Connection
 ```bash
 # Visit in browser or use curl
-http://localhost:3000/api/test-db
+https://buftcdc.com/api/test-db
 ```
 
 ### Test Email Connection
 ```bash
-http://localhost:3000/api/test-email
+https://buftcdc.com/api/test-email
 ```
 
 ### Send Test Email
 ```bash
-curl -X POST http://localhost:3000/api/test-email \
+curl -X POST https://buftcdc.com/api/test-email \
   -H "Content-Type: application/json" \
   -d '{"to":"your-email@example.com"}'
 ```
 
 ### Test FTP Connection
 ```bash
-http://localhost:3000/api/test-ftp
+https://buftcdc.com/api/test-ftp
 ```
 
 ---
