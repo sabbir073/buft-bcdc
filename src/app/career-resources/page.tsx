@@ -1118,9 +1118,9 @@ export default function CareerResourcesPage() {
 
           {/* View More Button */}
           <div className="text-center mt-10">
-            <button className="px-8 py-3 border-2 border-pink-600 text-pink-600 font-semibold rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300">
+            <Link href="/success-stories" className="px-8 py-3 border-2 border-pink-600 text-pink-600 font-semibold rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300">
               View All Success Stories
-            </button>
+            </Link>
           </div>
         </div>
       </section>
