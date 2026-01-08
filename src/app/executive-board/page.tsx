@@ -1,30 +1,62 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { board9, subExecutive9, board7, ExecutiveBoard } from "@/data/executives";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 interface Member {
-  id: number;
+  id: string;
   name: string;
   position: string;
   image: string;
 }
 
-const boards = [
-  { id: "board-9", label: "9th Executive Board", data: board9 },
-  { id: "sub-executive-9", label: "Sub-Executive Board 9.0", data: subExecutive9 },
-  { id: "board-7", label: "7th Executive Board", data: board7 },
-];
+interface ExecutiveBoard {
+  id: string;
+  name: string;
+  year: string;
+  members: Member[];
+}
 
 export default function ExecutiveBoardPage() {
-  const [activeBoard, setActiveBoard] = useState<string>("board-9");
+  const [boards, setBoards] = useState<ExecutiveBoard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeBoard, setActiveBoard] = useState<string>("");
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  const currentBoard = boards.find((b) => b.id === activeBoard)?.data as ExecutiveBoard;
+  // Fetch executive boards from API
+  useEffect(() => {
+    async function fetchBoards() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/executives`, {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch executives');
+        }
+
+        const data = await response.json();
+        setBoards(data);
+
+        // Set first board as active
+        if (data.length > 0) {
+          setActiveBoard(data[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching executive boards:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBoards();
+  }, []);
+
+  const currentBoard = boards.find((b) => b.id === activeBoard);
 
   const openModal = (member: Member) => {
     setSelectedMember(member);
@@ -87,48 +119,56 @@ export default function ExecutiveBoardPage() {
       {/* Tab Switcher */}
       <section className="sticky top-16 z-30 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center">
-            <div className="inline-flex gap-1 p-1.5 bg-gray-100 rounded-xl my-4">
-              {boards.map((board) => (
-                <button
-                  key={board.id}
-                  onClick={() => setActiveBoard(board.id)}
-                  className={`px-4 sm:px-6 py-2.5 text-sm sm:text-base font-medium rounded-lg transition-all duration-300 ${
-                    activeBoard === board.id
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-white"
-                  }`}
-                >
-                  {board.label}
-                </button>
-              ))}
+          {loading ? (
+            <div className="text-center py-6">
+              <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             </div>
-          </div>
+          ) : (
+            <div className="flex justify-center">
+              <div className="inline-flex gap-1 p-1.5 bg-gray-100 rounded-xl my-4">
+                {boards.map((board) => (
+                  <button
+                    key={board.id}
+                    onClick={() => setActiveBoard(board.id)}
+                    className={`px-4 sm:px-6 py-2.5 text-sm sm:text-base font-medium rounded-lg transition-all duration-300 ${
+                      activeBoard === board.id
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25"
+                        : "text-gray-600 hover:text-blue-600 hover:bg-white"
+                    }`}
+                  >
+                    {board.name} ({board.year})
+                </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Board Info */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                {currentBoard.name}
-              </h2>
-              <p className="text-gray-500 mt-1">Year: {currentBoard.year}</p>
+          {!loading && currentBoard && (
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  {currentBoard.name}
+                </h2>
+                <p className="text-gray-500 mt-1">Year: {currentBoard.year}</p>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <span className="font-semibold text-blue-700">{currentBoard.members.length} Members</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span className="font-semibold text-blue-700">{currentBoard.members.length} Members</span>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -136,7 +176,7 @@ export default function ExecutiveBoardPage() {
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {currentBoard.members.map((member) => (
+            {currentBoard?.members.map((member) => (
               <div
                 key={member.id}
                 onClick={() => openModal(member)}

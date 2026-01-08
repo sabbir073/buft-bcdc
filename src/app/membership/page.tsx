@@ -16,7 +16,7 @@ export default function MembershipPage() {
     whyJoin: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const benefits = [
@@ -86,53 +86,55 @@ export default function MembershipPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/membership', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    console.log("Form submitted:", formData);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: 'success',
+          message: `Application submitted successfully! We've sent a confirmation email to ${formData.email}. We'll review your application and get back to you soon.`
+        });
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          studentId: "",
+          department: "",
+          batch: "",
+          phone: "",
+          whyJoin: "",
+        });
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: result.error || 'Failed to submit application. Please try again.'
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: 'An error occurred while submitting your application. Please try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
-  if (isSubmitted) {
-    return (
-      <>
-        <Navbar />
-        <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white pt-20">
-          <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-            <div className="bg-white rounded-3xl shadow-2xl p-12">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h2>
-              <p className="text-gray-600 mb-8">
-                Thank you for your interest in joining BCDC. We have received your application and will review it shortly.
-                You will receive a confirmation email at {formData.email}.
-              </p>
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors"
-              >
-                Back to Home
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
 
   return (
     <>
@@ -418,6 +420,48 @@ export default function MembershipPage() {
                     </>
                   )}
                 </button>
+
+                {/* Success/Error Message */}
+                {submitStatus.type && (
+                  <div className={`mt-4 p-4 rounded-xl border ${
+                    submitStatus.type === 'success'
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      {submitStatus.type === 'success' ? (
+                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium ${
+                          submitStatus.type === 'success' ? 'text-green-800' : 'text-red-800'
+                        }`}>
+                          {submitStatus.message}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setSubmitStatus({ type: null, message: '' })}
+                        className={`flex-shrink-0 ${
+                          submitStatus.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'
+                        }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </form>
             </div>
           </div>

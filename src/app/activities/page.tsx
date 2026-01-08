@@ -3,9 +3,17 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { activities, Activity } from "@/data/activities";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+interface Activity {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  images: string[];
+  imageCount: number;
+}
 
 // Lightbox component
 function Lightbox({
@@ -286,8 +294,15 @@ function extractYear(dateString: string): string {
 }
 
 export default function ActivitiesPage() {
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState<string>("all");
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [lightbox, setLightbox] = useState<{
     isOpen: boolean;
     images: string[];
@@ -298,30 +313,88 @@ export default function ActivitiesPage() {
     currentIndex: 0,
   });
 
-  // Get unique years from activities, sorted newest first
-  const years = useMemo(() => {
-    const yearSet = new Set<string>();
-    activities.forEach((activity) => {
-      const year = extractYear(activity.date);
-      if (year) yearSet.add(year);
-    });
-    return Array.from(yearSet).sort((a, b) => parseInt(b) - parseInt(a));
-  }, []);
+  const ITEMS_PER_PAGE = 12;
 
-  // Sort activities by id (newest first) and apply filters
-  const filteredActivities = useMemo(() => {
-    return [...activities]
-      .sort((a, b) => b.id - a.id)
-      .filter((activity) => {
-        const matchesSearch = activity.title
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const matchesYear =
-          selectedYear === "all" ||
-          extractYear(activity.date) === selectedYear;
-        return matchesSearch && matchesYear;
-      });
+  // Fetch activities from API (reset when filters change)
+  useEffect(() => {
+    async function fetchActivities() {
+      setLoading(true);
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const params = new URLSearchParams({
+          limit: ITEMS_PER_PAGE.toString(),
+          offset: '0',
+        });
+
+        if (searchQuery) {
+          params.append('search', searchQuery);
+        }
+
+        if (selectedYear !== 'all') {
+          params.append('year', selectedYear);
+        }
+
+        const response = await fetch(`${baseUrl}/api/public/activities?${params.toString()}`, {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch activities');
+        }
+
+        const data = await response.json();
+        setActivities(data.activities);
+        setTotal(data.total);
+        setHasMore(data.hasMore);
+        setAvailableYears(data.years || []);
+        setOffset(ITEMS_PER_PAGE);
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchActivities();
   }, [searchQuery, selectedYear]);
+
+  // Load more activities
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const params = new URLSearchParams({
+        limit: ITEMS_PER_PAGE.toString(),
+        offset: offset.toString(),
+      });
+
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      if (selectedYear !== 'all') {
+        params.append('year', selectedYear);
+      }
+
+      const response = await fetch(`${baseUrl}/api/public/activities?${params.toString()}`, {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch activities');
+      }
+
+      const data = await response.json();
+      setActivities(prev => [...prev, ...data.activities]);
+      setHasMore(data.hasMore);
+      setOffset(prev => prev + ITEMS_PER_PAGE);
+    } catch (error) {
+      console.error('Error loading more activities:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
 
   const openGallery = (images: string[], index: number) => {
     setLightbox({ isOpen: true, images, currentIndex: index });
@@ -423,8 +496,8 @@ export default function ActivitiesPage() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-gray-900 bg-white cursor-pointer"
                 >
                   <option value="all">All Years</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
+                  {availableYears.map((year) => (
+                    <option key={year} value={year.toString()}>
                       {year}
                     </option>
                   ))}
@@ -460,24 +533,74 @@ export default function ActivitiesPage() {
 
             {/* Results count */}
             <div className="mt-4 text-sm text-gray-500">
-              Showing {filteredActivities.length} of {activities.length}{" "}
-              activities
+              {searchQuery || selectedYear !== "all" ? (
+                <>
+                  {searchQuery && selectedYear !== "all" ? (
+                    <>Found {total} {total === 1 ? 'activity' : 'activities'} for "{searchQuery}" in {selectedYear}</>
+                  ) : searchQuery ? (
+                    <>Found {total} {total === 1 ? 'activity' : 'activities'} for "{searchQuery}"</>
+                  ) : (
+                    <>Found {total} {total === 1 ? 'activity' : 'activities'} in {selectedYear}</>
+                  )}
+                </>
+              ) : (
+                <>Showing {activities.length} of {total} activities</>
+              )}
             </div>
           </div>
         </div>
 
         {/* Activities Grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {filteredActivities.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredActivities.map((activity) => (
-                <ActivityCard
-                  key={activity.id}
-                  activity={activity}
-                  onOpenGallery={openGallery}
-                />
-              ))}
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-600">Loading activities...</p>
             </div>
+          ) : activities.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {activities.map((activity) => (
+                  <ActivityCard
+                    key={activity.id}
+                    activity={activity}
+                    onOpenGallery={openGallery}
+                  />
+                ))}
+              </div>
+
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="mt-12 text-center">
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 mx-auto"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <span>Load More</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                  <p className="mt-4 text-sm text-gray-500">
+                    {searchQuery || selectedYear !== "all" ? (
+                      <>Showing {activities.length} of {total} filtered {total === 1 ? 'result' : 'results'}</>
+                    ) : (
+                      <>Showing {activities.length} of {total} activities</>
+                    )}
+                  </p>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-20">
               <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">

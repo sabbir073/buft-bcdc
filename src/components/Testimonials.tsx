@@ -17,63 +17,33 @@ export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const testimonials: Testimonial[] = [
-    {
-      id: 1,
-      name: "Rahul Ahmed",
-      role: "Software Engineer",
-      company: "Apex Textile Ltd.",
-      text: "BCDC helped me land my dream internship. The career workshops and networking events were invaluable in preparing me for the industry. The mentorship I received gave me the confidence to excel in interviews.",
-      rating: 5,
-      batch: "Batch 2020",
-    },
-    {
-      id: 2,
-      name: "Fatima Khan",
-      role: "Design Lead",
-      company: "Fashion House BD",
-      text: "The mentorship program at BCDC connected me with industry professionals who guided my career path. The exposure to real-world challenges through their events was transformative for my professional growth.",
-      rating: 5,
-      batch: "Batch 2019",
-    },
-    {
-      id: 3,
-      name: "Mohammad Hasan",
-      role: "Production Manager",
-      company: "Textile Corp International",
-      text: "From resume building to interview prep, BCDC provided comprehensive support. Their placement drive helped me secure my first job within weeks of graduation. Forever grateful to this amazing community!",
-      rating: 5,
-      batch: "Batch 2021",
-    },
-    {
-      id: 4,
-      name: "Nadia Islam",
-      role: "Quality Analyst",
-      company: "Garments Plus Ltd.",
-      text: "The career resources and guidance from BCDC were instrumental in my professional development. The skills workshops helped me stand out from other candidates and land my dream role.",
-      rating: 5,
-      batch: "Batch 2020",
-    },
-    {
-      id: 5,
-      name: "Karim Uddin",
-      role: "Merchandiser",
-      company: "Export Solutions BD",
-      text: "BCDC's industry connections opened doors I never knew existed. The seminars with industry experts were eye-opening and helped me understand the real expectations of the textile industry.",
-      rating: 5,
-      batch: "Batch 2018",
-    },
-    {
-      id: 6,
-      name: "Sadia Rahman",
-      role: "HR Executive",
-      company: "Corporate BD Ltd.",
-      text: "Being part of BCDC gave me the confidence and skills to excel in interviews. Their support system is truly exceptional. The mock interview sessions were particularly helpful in my preparation.",
-      rating: 5,
-      batch: "Batch 2019",
-    },
-  ];
+  // Fetch testimonials from API
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/public/success-stories');
+        const result = await response.json();
+
+        if (result.success && result.data) {
+          setTestimonials(result.data);
+        } else {
+          setError('Failed to load testimonials');
+        }
+      } catch (err) {
+        console.error('Error fetching testimonials:', err);
+        setError('Failed to load testimonials');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchTestimonials();
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) =>
@@ -111,6 +81,40 @@ export default function Testimonials() {
     }
     return visible;
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section id="testimonials" className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/5 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Loading Success Stories...</h2>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show error state
+  if (error || testimonials.length === 0) {
+    return (
+      <section id="testimonials" className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/5 rounded-full blur-2xl -translate-x-1/2 -translate-y-1/2" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Success Stories</h2>
+          <p className="text-white/80">No testimonials available at the moment.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="testimonials" className="py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
@@ -317,15 +321,26 @@ export default function Testimonials() {
         {/* CTA Section */}
         <div className="text-center mt-12">
           <p className="text-white/80 mb-4">Ready to start your success story?</p>
-          <a
-            href="/membership"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-50 transition-colors shadow-lg"
-          >
-            Join BCDC Today
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="/membership"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Join BCDC Today
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <a
+              href="/success-stories"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-full hover:bg-white/10 transition-colors"
+            >
+              View All Stories
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </section>

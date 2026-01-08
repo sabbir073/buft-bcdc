@@ -2,178 +2,275 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import JobApplicationModal from "@/components/JobApplicationModal";
 
-// Placeholder job data
-const jobOpportunities = [
-  {
-    id: 1,
-    title: "Quality Control Manager",
-    company: "ABC Textiles Ltd.",
-    location: "Dhaka, Bangladesh",
-    type: "Full-time",
-    deadline: "January 15, 2026",
-    image: "/placeholder-job-1.jpg",
-    description:
-      "We are looking for an experienced Quality Control Manager to oversee our production quality standards.",
-  },
-  {
-    id: 2,
-    title: "Fashion Design Intern",
-    company: "Style House Bangladesh",
-    location: "Gazipur, Bangladesh",
-    type: "Internship",
-    deadline: "January 20, 2026",
-    image: "/placeholder-job-2.jpg",
-    description:
-      "Join our design team as an intern and gain hands-on experience in fashion design and product development.",
-  },
-  {
-    id: 3,
-    title: "Merchandiser",
-    company: "Global Apparel Export",
-    location: "Chittagong, Bangladesh",
-    type: "Full-time",
-    deadline: "January 25, 2026",
-    image: "/placeholder-job-3.jpg",
-    description:
-      "Seeking a dynamic merchandiser to handle international buyer communications and order management.",
-  },
-  {
-    id: 4,
-    title: "Production Planning Trainee",
-    company: "Textile Mills Corporation",
-    location: "Narayanganj, Bangladesh",
-    type: "Trainee",
-    deadline: "February 1, 2026",
-    image: "/placeholder-job-4.jpg",
-    description:
-      "Start your career in production planning with our comprehensive training program.",
-  },
-];
+interface JobPost {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  deadline: string | null;
+  description: string;
+  salaryRange?: string | null;
+  applicationUrl?: string | null;
+  contactEmail?: string | null;
+  requirements?: string | null;
+}
 
-// Placeholder CV templates
-const cvTemplates = [
-  {
-    id: 1,
-    title: "Modern Professional",
-    image: "/placeholder-cv-1.jpg",
-    downloadUrl: "#",
-  },
-  {
-    id: 2,
-    title: "Creative Designer",
-    image: "/placeholder-cv-2.jpg",
-    downloadUrl: "#",
-  },
-  {
-    id: 3,
-    title: "Corporate Classic",
-    image: "/placeholder-cv-3.jpg",
-    downloadUrl: "#",
-  },
-  {
-    id: 4,
-    title: "Minimalist Clean",
-    image: "/placeholder-cv-4.jpg",
-    downloadUrl: "#",
-  },
-  {
-    id: 5,
-    title: "Fresh Graduate",
-    image: "/placeholder-cv-5.jpg",
-    downloadUrl: "#",
-  },
-  {
-    id: 6,
-    title: "Executive Style",
-    image: "/placeholder-cv-6.jpg",
-    downloadUrl: "#",
-  },
-];
+interface CVTemplate {
+  id: number;
+  title: string;
+  description?: string;
+  category: string;
+  downloadUrl: string;
+  downloads?: number;
+}
 
-// Placeholder interview videos
-const interviewVideos = [
-  {
-    id: 1,
-    title: "How to Ace Your First Interview",
-    thumbnail: "/placeholder-video-1.jpg",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    duration: "12:45",
-    views: "15K",
-  },
-  {
-    id: 2,
-    title: "Common Interview Questions & Best Answers",
-    thumbnail: "/placeholder-video-2.jpg",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    duration: "18:30",
-    views: "22K",
-  },
-  {
-    id: 3,
-    title: "Body Language Tips for Interviews",
-    thumbnail: "/placeholder-video-3.jpg",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    duration: "10:15",
-    views: "8K",
-  },
-  {
-    id: 4,
-    title: "Virtual Interview Preparation Guide",
-    thumbnail: "/placeholder-video-4.jpg",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    duration: "14:20",
-    views: "12K",
-  },
-];
+interface InterviewTip {
+  id: number;
+  title: string;
+  category: string;
+  content: string;
+  videoUrl: string;
+  duration: string;
+  thumbnailUrl: string;
+  viewsCount: number;
+  displayOrder: number;
+}
 
-// Placeholder career guidelines
-const careerGuidelines = [
-  {
-    id: 1,
-    title: "Building Your Career in the Textile Industry",
-    excerpt:
-      "The textile industry offers diverse career paths from design to management. Learn how to navigate your journey and make strategic decisions for long-term success.",
-    content:
-      "The textile and fashion industry is one of the most dynamic sectors in Bangladesh...",
-    author: "Career Team",
-    date: "December 28, 2025",
-    readTime: "8 min read",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    videoTitle: "Career Paths in Textile Industry",
-  },
-  {
-    id: 2,
-    title: "From Campus to Corporate: A Graduate's Guide",
-    excerpt:
-      "Transitioning from student life to the professional world can be challenging. This comprehensive guide covers everything you need to know.",
-    content:
-      "Making the transition from university to the corporate world requires preparation...",
-    author: "Career Team",
-    date: "December 20, 2025",
-    readTime: "10 min read",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    videoTitle: "Campus to Corporate Transition",
-  },
-  {
-    id: 3,
-    title: "Networking Strategies for Career Growth",
-    excerpt:
-      "Discover effective networking strategies that can open doors to new opportunities and accelerate your career progression.",
-    content:
-      "Professional networking is one of the most powerful tools for career advancement...",
-    author: "Career Team",
-    date: "December 15, 2025",
-    readTime: "6 min read",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    videoTitle: "Professional Networking Tips",
-  },
-];
+interface CareerGuideline {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  excerpt: string;
+  author: string;
+  readTime: string;
+  thumbnailUrl: string | null;
+  videoUrl: string | null;
+  videoTitle: string | null;
+  viewsCount: number;
+  date: string;
+}
+
+interface SuccessStory {
+  id: number;
+  name: string;
+  designation: string;
+  company: string;
+  testimonial: string;
+  imageUrl: string | null;
+  date: string;
+}
 
 export default function CareerResourcesPage() {
+  const [jobOpportunities, setJobOpportunities] = useState<JobPost[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [cvTemplates, setCvTemplates] = useState<CVTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
+  const [interviewTips, setInterviewTips] = useState<InterviewTip[]>([]);
+  const [loadingTips, setLoadingTips] = useState(true);
+  const [careerGuidelines, setCareerGuidelines] = useState<CareerGuideline[]>([]);
+  const [loadingGuidelines, setLoadingGuidelines] = useState(true);
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
+  const [loadingStories, setLoadingStories] = useState(true);
+  const [selectedJob, setSelectedJob] = useState<JobPost | null>(null);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+  const [selectedTip, setSelectedTip] = useState<InterviewTip | null>(null);
+  const [selectedGuideline, setSelectedGuideline] = useState<CareerGuideline | null>(null);
+
+  // Extract YouTube video ID from URL
+  const getYouTubeId = (url: string | null) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : null;
+  };
+
+  // Handle interview tip click - track view and open modal
+  const handleTipClick = async (tip: InterviewTip) => {
+    setSelectedTip(tip);
+
+    // Track view
+    try {
+      await fetch(`/api/public/interview-tips/${tip.id}/view`, {
+        method: 'POST',
+      });
+
+      // Update local state
+      setInterviewTips(prev =>
+        prev.map(t =>
+          t.id === tip.id ? { ...t, viewsCount: (t.viewsCount || 0) + 1 } : t
+        )
+      );
+    } catch (error) {
+      console.error('Failed to track view:', error);
+    }
+  };
+
+  // Handle career guideline click - track view and open modal
+  const handleGuidelineClick = async (guideline: CareerGuideline) => {
+    setSelectedGuideline(guideline);
+
+    // Track view
+    try {
+      await fetch(`/api/public/career-guidelines/${guideline.id}/view`, {
+        method: 'POST',
+      });
+
+      // Update local state
+      setCareerGuidelines(prev =>
+        prev.map(g =>
+          g.id === guideline.id ? { ...g, viewsCount: (g.viewsCount || 0) + 1 } : g
+        )
+      );
+    } catch (error) {
+      console.error('Failed to track view:', error);
+    }
+  };
+
+  // Handle CV template download with tracking
+  const handleDownload = async (template: CVTemplate) => {
+    try {
+      // Track the download
+      await fetch(`/api/public/cv-templates/${template.id}/download`, {
+        method: 'POST',
+      });
+
+      // Update local state to show incremented count
+      setCvTemplates(prev => prev.map(t =>
+        t.id === template.id
+          ? { ...t, downloads: (t.downloads || 0) + 1 }
+          : t
+      ));
+
+      // Open the PDF in a new tab
+      window.open(template.downloadUrl, '_blank');
+    } catch (error) {
+      console.error('Failed to track download:', error);
+      // Still open the PDF even if tracking fails
+      window.open(template.downloadUrl, '_blank');
+    }
+  };
+
+  // Fetch job posts from API
+  useEffect(() => {
+    async function fetchJobs() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/job-posts`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setJobOpportunities(data.slice(0, 4)); // Show only first 4 jobs
+        }
+      } catch (error) {
+        console.error('Failed to fetch jobs:', error);
+      } finally {
+        setLoadingJobs(false);
+      }
+    }
+
+    fetchJobs();
+  }, []);
+
+  // Fetch CV templates from API
+  useEffect(() => {
+    async function fetchTemplates() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/cv-templates`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCvTemplates(data.templates || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch CV templates:', error);
+      } finally {
+        setLoadingTemplates(false);
+      }
+    }
+
+    fetchTemplates();
+  }, []);
+
+  // Fetch interview tips from API
+  useEffect(() => {
+    async function fetchInterviewTips() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/interview-tips`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setInterviewTips(data.tips || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch interview tips:', error);
+      } finally {
+        setLoadingTips(false);
+      }
+    }
+
+    fetchInterviewTips();
+  }, []);
+
+  // Fetch career guidelines from API
+  useEffect(() => {
+    async function fetchCareerGuidelines() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/career-guidelines?limit=3`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCareerGuidelines(data.guidelines || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch career guidelines:', error);
+      } finally {
+        setLoadingGuidelines(false);
+      }
+    }
+
+    fetchCareerGuidelines();
+  }, []);
+
+  // Fetch success stories from API
+  useEffect(() => {
+    async function fetchSuccessStories() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/success-stories?limit=4`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setSuccessStories(data.stories || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch success stories:', error);
+      } finally {
+        setLoadingStories(false);
+      }
+    }
+
+    fetchSuccessStories();
+  }, []);
+
   // Smooth scroll to section on page load if hash is present
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash) {
@@ -217,6 +314,7 @@ export default function CareerResourcesPage() {
               { href: "#cv-template", label: "CV Templates", color: "#22c55e" },
               { href: "#interview-tips", label: "Interview Tips", color: "#8b5cf6" },
               { href: "#career-guideline", label: "Career Guidelines", color: "#f97316" },
+              { href: "#success-stories", label: "Success Stories", color: "#ec4899" },
             ].map((item) => (
               <a
                 key={item.href}
@@ -267,8 +365,33 @@ export default function CareerResourcesPage() {
           </div>
 
           {/* Job Cards Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {jobOpportunities.map((job) => (
+          {loadingJobs ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="text-gray-600">Loading job opportunities...</span>
+              </div>
+            </div>
+          ) : jobOpportunities.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <svg
+                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-gray-500">No job opportunities available at the moment</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6">
+              {jobOpportunities.map((job) => (
               <div
                 key={job.id}
                 className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group"
@@ -305,6 +428,18 @@ export default function CareerResourcesPage() {
                   >
                     {job.type}
                   </span>
+                  {/* Status Badge */}
+                  {job.deadline && (
+                    <span
+                      className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${
+                        new Date(job.deadline) < new Date()
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {new Date(job.deadline) < new Date() ? "Closed" : "Open"}
+                    </span>
+                  )}
                 </div>
 
                 {/* Job Content */}
@@ -355,19 +490,26 @@ export default function CareerResourcesPage() {
                     </span>
                   </div>
 
-                  <button className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors">
-                    Apply Now
+                  <button
+                    onClick={() => setSelectedJob(job)}
+                    className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+                  >
+                    View Details
                   </button>
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
 
           {/* View More Button */}
           <div className="text-center mt-10">
-            <button className="px-8 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300">
+            <Link
+              href="/jobs"
+              className="px-8 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300 inline-block"
+            >
               View All Job Openings
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -406,46 +548,91 @@ export default function CareerResourcesPage() {
             </div>
           </div>
 
-          {/* CV Templates Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cvTemplates.map((template) => (
-              <div
-                key={template.id}
-                className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
-              >
-                {/* Template Preview */}
-                <div className="relative aspect-[3/4] bg-gradient-to-br from-green-100 to-green-200">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center p-6">
-                      {/* Placeholder CV Preview */}
-                      <div className="bg-white rounded-lg shadow-md p-4 transform group-hover:scale-105 transition-transform duration-300">
-                        <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-3" />
-                        <div className="w-24 h-3 bg-gray-200 rounded mx-auto mb-2" />
-                        <div className="w-20 h-2 bg-gray-100 rounded mx-auto mb-4" />
-                        <div className="space-y-2">
-                          <div className="w-full h-2 bg-gray-100 rounded" />
-                          <div className="w-full h-2 bg-gray-100 rounded" />
-                          <div className="w-3/4 h-2 bg-gray-100 rounded" />
+          {/* Loading State */}
+          {loadingTemplates ? (
+            <div className="text-center py-12">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-green-600 border-r-transparent"></div>
+              <p className="mt-4 text-gray-600">Loading CV templates...</p>
+            </div>
+          ) : cvTemplates.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl shadow-lg border border-gray-100">
+              <p className="text-gray-600">No CV templates available at the moment.</p>
+            </div>
+          ) : (
+            <>
+              {/* CV Templates Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cvTemplates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+                  >
+                    {/* Template Preview */}
+                    <div className="relative aspect-[3/4] bg-gradient-to-br from-green-100 to-green-200">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center p-6">
+                          {/* Placeholder CV Preview */}
+                          <div className="bg-white rounded-lg shadow-md p-4 transform group-hover:scale-105 transition-transform duration-300">
+                            <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-3" />
+                            <div className="w-24 h-3 bg-gray-200 rounded mx-auto mb-2" />
+                            <div className="w-20 h-2 bg-gray-100 rounded mx-auto mb-4" />
+                            <div className="space-y-2">
+                              <div className="w-full h-2 bg-gray-100 rounded" />
+                              <div className="w-full h-2 bg-gray-100 rounded" />
+                              <div className="w-3/4 h-2 bg-gray-100 rounded" />
+                            </div>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Category Badge */}
+                      <span className="absolute top-4 left-4 px-3 py-1 bg-green-600 text-white rounded-full text-xs font-semibold">
+                        {template.category}
+                      </span>
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-green-600/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => handleDownload(template)}
+                          className="px-6 py-3 bg-white text-green-600 font-semibold rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-green-50"
+                        >
+                          Download
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Template Info */}
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-900 text-center mb-2">{template.title}</h3>
+                      {template.description && (
+                        <p className="text-sm text-gray-600 text-center line-clamp-2">
+                          {template.description}
+                        </p>
+                      )}
+                      {template.downloads !== undefined && (
+                        <div className="flex items-center justify-center mt-3 text-xs text-gray-500">
+                          <svg
+                            className="w-4 h-4 mr-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                          </svg>
+                          {template.downloads} downloads
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-green-600/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <button className="px-6 py-3 bg-white text-green-600 font-semibold rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      Download
-                    </button>
-                  </div>
-                </div>
-
-                {/* Template Info */}
-                <div className="p-4 text-center">
-                  <h3 className="font-bold text-gray-900">{template.title}</h3>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -486,46 +673,122 @@ export default function CareerResourcesPage() {
           </div>
 
           {/* Video Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {interviewVideos.map((video) => (
-              <a
-                key={video.id}
-                href={video.youtubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+          {loadingTips ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <span className="text-gray-600">Loading interview tips...</span>
+              </div>
+            </div>
+          ) : interviewTips.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <svg
+                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {/* Video Thumbnail */}
-                <div className="relative aspect-video bg-gradient-to-br from-purple-100 to-purple-200">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {/* Play Button */}
-                    <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        className="w-8 h-8 text-white ml-1"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <p className="text-gray-500">No interview tips available at the moment</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {interviewTips.slice(0, 8).map((tip) => {
+                const videoId = getYouTubeId(tip.videoUrl);
+                const thumbnailUrl = tip.thumbnailUrl || (videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null);
+
+                return (
+                  <div
+                    key={tip.id}
+                    onClick={() => handleTipClick(tip)}
+                    className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  >
+                    {/* Video Thumbnail */}
+                    <div className="relative aspect-video bg-gradient-to-br from-purple-100 to-purple-200">
+                      {thumbnailUrl ? (
+                        <img
+                          src={thumbnailUrl}
+                          alt={tip.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                            <svg
+                              className="w-8 h-8 text-white ml-1"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                          <svg
+                            className="w-8 h-8 text-white ml-1"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      {/* Duration Badge */}
+                      {tip.duration && (
+                        <span className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                          {tip.duration}
+                        </span>
+                      )}
+
+                      {/* Category Badge */}
+                      {tip.category && (
+                        <span className="absolute top-2 left-2 px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
+                          {tip.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Video Info */}
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+                        {tip.title}
+                      </h3>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        {(tip.viewsCount || 0).toLocaleString()} views
+                      </div>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          )}
 
-                  {/* Duration Badge */}
-                  <span className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
-                    {video.duration}
-                  </span>
-                </div>
-
-                {/* Video Info */}
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
-                    {video.title}
-                  </h3>
-                  <span className="text-sm text-gray-500">{video.views} views</span>
-                </div>
-              </a>
-            ))}
-          </div>
+          {/* View All Interview Tips Button */}
+          {interviewTips.length > 0 && (
+            <div className="text-center mt-10">
+              <Link
+                href="/interview-tips"
+                className="px-8 py-3 border-2 border-purple-600 text-purple-600 font-semibold rounded-full hover:bg-purple-600 hover:text-white transition-all duration-300 inline-block"
+              >
+                View All Interview Tips
+              </Link>
+            </div>
+          )}
 
           {/* Tips Cards */}
           <div className="mt-12 grid md:grid-cols-3 gap-6">
@@ -610,74 +873,124 @@ export default function CareerResourcesPage() {
             </div>
           </div>
 
-          {/* Blog-style Cards */}
-          <div className="space-y-8">
-            {careerGuidelines.map((guide, index) => (
-              <div
-                key={guide.id}
-                className={`bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 ${
-                  index % 2 === 0 ? "" : "lg:flex-row-reverse"
-                }`}
-              >
-                <div className="lg:flex">
-                  {/* Content Side */}
-                  <div className="lg:w-1/2 p-8">
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-                      <span>{guide.date}</span>
-                      <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                      <span>{guide.readTime}</span>
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 hover:text-orange-600 transition-colors cursor-pointer">
-                      {guide.title}
-                    </h3>
-
-                    <p className="text-gray-600 mb-6 leading-relaxed">{guide.excerpt}</p>
-
-                    <div className="flex items-center gap-4">
-                      <button className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition-colors">
-                        Read Full Article
-                      </button>
-                      <span className="text-sm text-gray-500">By {guide.author}</span>
-                    </div>
-                  </div>
-
-                  {/* Video Side */}
-                  <div className="lg:w-1/2 p-6 bg-gradient-to-br from-orange-50 to-orange-100">
-                    <div className="h-full flex flex-col">
-                      <h4 className="font-semibold text-gray-900 mb-3">
-                        Related Video
-                      </h4>
-                      <a
-                        href={guide.videoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex-1 relative rounded-xl overflow-hidden bg-gradient-to-br from-orange-200 to-orange-300 min-h-[200px]"
-                      >
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          {/* Play Button */}
-                          <div className="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                            <svg
-                              className="w-10 h-10 text-white ml-1"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="absolute bottom-4 left-4 right-4">
-                          <p className="text-white bg-black/50 px-3 py-2 rounded-lg text-sm font-medium">
-                            {guide.videoTitle}
-                          </p>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                </div>
+          {/* Guidelines Grid */}
+          {loadingGuidelines ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                <span className="text-gray-600">Loading career guidelines...</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : careerGuidelines.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <svg
+                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                />
+              </svg>
+              <p className="text-gray-500">No career guidelines available at the moment</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {careerGuidelines.map((guide) => {
+                const videoId = getYouTubeId(guide.videoUrl);
+                const thumbnailUrl = guide.thumbnailUrl || (videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null);
+
+                return (
+                  <article
+                    key={guide.id}
+                    onClick={() => handleGuidelineClick(guide)}
+                    className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col"
+                  >
+                    {/* Thumbnail */}
+                    <div className="relative aspect-[16/9] bg-gradient-to-br from-orange-100 to-orange-200 overflow-hidden">
+                      {thumbnailUrl ? (
+                        <img
+                          src={thumbnailUrl}
+                          alt={guide.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <svg className="w-16 h-16 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        </div>
+                      )}
+
+                      {/* Category Badge */}
+                      {guide.category && (
+                        <span className="absolute top-3 left-3 px-3 py-1 bg-orange-600 text-white text-xs font-medium rounded-full">
+                          {guide.category}
+                        </span>
+                      )}
+
+                      {/* Video indicator */}
+                      {guide.videoUrl && (
+                        <div className="absolute bottom-3 right-3 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-5 h-5 text-orange-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5 flex-1 flex flex-col">
+                      {/* Title */}
+                      <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-orange-600 transition-colors">
+                        {guide.title}
+                      </h3>
+
+                      {/* Excerpt */}
+                      <p className="text-gray-600 text-sm line-clamp-2 mb-4 flex-1">
+                        {guide.excerpt}
+                      </p>
+
+                      {/* Meta Info */}
+                      <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {guide.readTime}
+                          </span>
+                        </div>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          {(guide.viewsCount || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          {/* View All Career Guidelines Button */}
+          {careerGuidelines.length > 0 && (
+            <div className="text-center mt-10">
+              <Link
+                href="/career-guidelines"
+                className="px-8 py-3 border-2 border-orange-600 text-orange-600 font-semibold rounded-full hover:bg-orange-600 hover:text-white transition-all duration-300 inline-block"
+              >
+                View All Career Guidelines
+              </Link>
+            </div>
+          )}
 
           {/* Additional Resources */}
           <div className="mt-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
@@ -696,17 +1009,474 @@ export default function CareerResourcesPage() {
                 </p>
               </div>
               <Link
-                href="/#contact"
+                href="/contact"
                 className="px-8 py-4 bg-white text-orange-600 font-semibold rounded-full hover:bg-orange-50 transition-colors shadow-lg whitespace-nowrap"
               >
-                Book a Session
+                Contact Now
               </Link>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Success Stories Section */}
+      <section
+        id="success-stories"
+        className="py-20 bg-gradient-to-b from-pink-50 to-white scroll-mt-20"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="flex items-center gap-4 mb-12">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center"
+              style={{ backgroundColor: "#ec489915", color: "#ec4899" }}
+            >
+              <svg
+                className="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900">Success Stories</h2>
+              <p className="text-gray-600 mt-1">
+                Inspiring journeys of our alumni who achieved their career goals
+              </p>
+            </div>
+          </div>
+
+          {/* Success Stories Grid */}
+          {loadingStories ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+                <span className="text-gray-600">Loading success stories...</span>
+              </div>
+            </div>
+          ) : successStories.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+              <svg
+                className="w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                />
+              </svg>
+              <p className="text-gray-500">No success stories available at the moment</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8">
+              {successStories.map((story) => (
+                <div
+                  key={story.id}
+                  className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="p-8">
+                    {/* Quote Icon */}
+                    <div className="text-pink-200 mb-4">
+                      <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                      </svg>
+                    </div>
+
+                    {/* Testimonial */}
+                    <p className="text-gray-600 leading-relaxed mb-6 line-clamp-6">
+                      {story.testimonial}
+                    </p>
+
+                    {/* Author Info */}
+                    <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-bold text-lg">
+                        {story.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900">{story.name}</h4>
+                        <p className="text-sm text-gray-500">
+                          {story.designation} at {story.company}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* View More Button */}
+          <div className="text-center mt-10">
+            <button className="px-8 py-3 border-2 border-pink-600 text-pink-600 font-semibold rounded-full hover:bg-pink-600 hover:text-white transition-all duration-300">
+              View All Success Stories
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Job Detail Modal */}
+      {selectedJob && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Job Details</h2>
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+              >
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              {/* Job Header */}
+              <div className="mb-6">
+                <div className="flex gap-2 mb-3">
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                      selectedJob.type === "Full-time"
+                        ? "bg-green-100 text-green-700"
+                        : selectedJob.type === "Internship"
+                        ? "bg-purple-100 text-purple-700"
+                        : selectedJob.type === "Part-time"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+                    {selectedJob.type}
+                  </span>
+                  {selectedJob.deadline && (
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        new Date(selectedJob.deadline) < new Date()
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {new Date(selectedJob.deadline) < new Date() ? "Closed" : "Open"}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{selectedJob.title}</h3>
+                <p className="text-lg text-blue-600 font-medium">{selectedJob.company}</p>
+              </div>
+
+              {/* Job Info */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Location</p>
+                    <p className="text-sm font-medium text-gray-900">{selectedJob.location}</p>
+                  </div>
+                </div>
+
+                {selectedJob.deadline && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Deadline</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedJob.deadline}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedJob.salaryRange && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Salary Range</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedJob.salaryRange}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedJob.contactEmail && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Contact</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{selectedJob.contactEmail}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-3">Job Description</h4>
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line">{selectedJob.description}</p>
+              </div>
+
+              {/* Requirements */}
+              {selectedJob.requirements && (
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h4>
+                  <div className="text-gray-600 leading-relaxed whitespace-pre-line">{selectedJob.requirements}</div>
+                </div>
+              )}
+
+              {/* Apply Button */}
+              <div className="flex gap-3">
+                {selectedJob.deadline && new Date(selectedJob.deadline) < new Date() ? (
+                  <button disabled className="flex-1 py-4 bg-gray-300 text-gray-500 font-semibold rounded-xl cursor-not-allowed text-center">
+                    Application Closed
+                  </button>
+                ) : selectedJob.applicationUrl ? (
+                  <a
+                    href={selectedJob.applicationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-2"
+                  >
+                    Apply Now
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setShowApplicationModal(true)}
+                    className="flex-1 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-2"
+                  >
+                    Apply Now
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="px-6 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
+
+      {/* Job Application Modal */}
+      {selectedJob && showApplicationModal && (
+        <JobApplicationModal
+          isOpen={showApplicationModal}
+          onClose={() => setShowApplicationModal(false)}
+          jobId={selectedJob.id}
+          jobTitle={selectedJob.title}
+          companyName={selectedJob.company}
+        />
+      )}
+
+      {/* Interview Tip Video Modal */}
+      {selectedTip && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+              <div className="flex-1 pr-4">
+                <h2 className="text-xl font-bold text-gray-900 line-clamp-1">{selectedTip.title}</h2>
+                <div className="flex items-center gap-4 mt-1">
+                  {selectedTip.category && (
+                    <span className="text-sm text-purple-600 font-medium">{selectedTip.category}</span>
+                  )}
+                  <span className="text-sm text-gray-500">
+                    {(selectedTip.viewsCount || 0).toLocaleString()} views
+                  </span>
+                  {selectedTip.duration && (
+                    <span className="text-sm text-gray-500">{selectedTip.duration}</span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedTip(null)}
+                className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors flex-shrink-0"
+              >
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="p-6">
+              {selectedTip.videoUrl && getYouTubeId(selectedTip.videoUrl) ? (
+                <div className="relative aspect-video bg-black rounded-xl overflow-hidden mb-6">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(selectedTip.videoUrl)}?autoplay=1&rel=0`}
+                    title={selectedTip.title}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <div className="relative aspect-video bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center mb-6">
+                  <div className="text-center">
+                    <svg className="w-16 h-16 text-purple-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-purple-600">No video available</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {selectedTip.content && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                  <div className="text-gray-600 leading-relaxed whitespace-pre-line">
+                    {selectedTip.content}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-100 px-6 py-4 rounded-b-2xl">
+              <button
+                onClick={() => setSelectedTip(null)}
+                className="w-full py-3 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Career Guideline Modal */}
+      {selectedGuideline && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-start justify-between rounded-t-2xl z-10">
+              <div className="flex-1 pr-4">
+                <h2 className="text-xl font-bold text-gray-900">{selectedGuideline.title}</h2>
+                <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-500">
+                  {selectedGuideline.category && (
+                    <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                      {selectedGuideline.category}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    {selectedGuideline.author}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {selectedGuideline.readTime}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {(selectedGuideline.viewsCount || 0).toLocaleString()} views
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedGuideline(null)}
+                className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors flex-shrink-0"
+              >
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              {/* Featured Image or Video */}
+              {selectedGuideline.videoUrl && getYouTubeId(selectedGuideline.videoUrl) ? (
+                <div className="mb-6">
+                  {selectedGuideline.videoTitle && (
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{selectedGuideline.videoTitle}</h3>
+                  )}
+                  <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${getYouTubeId(selectedGuideline.videoUrl)}?rel=0`}
+                      title={selectedGuideline.videoTitle || selectedGuideline.title}
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              ) : selectedGuideline.thumbnailUrl ? (
+                <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-6">
+                  <img
+                    src={selectedGuideline.thumbnailUrl}
+                    alt={selectedGuideline.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : null}
+
+              {/* Article Content */}
+              <div className="prose prose-orange max-w-none">
+                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {selectedGuideline.content}
+                </div>
+              </div>
+
+              {/* Date */}
+              <div className="mt-6 pt-4 border-t border-gray-100 text-sm text-gray-500">
+                Published on {selectedGuideline.date}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-100 px-6 py-4 rounded-b-2xl">
+              <button
+                onClick={() => setSelectedGuideline(null)}
+                className="w-full py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

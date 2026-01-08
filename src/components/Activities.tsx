@@ -1,9 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
-import { activities, Activity } from "@/data/activities";
 
-// Featured activity IDs to display
-const FEATURED_IDS = [10, 14, 31];
+interface Activity {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  images: string[];
+  imageCount: number;
+}
+
+async function getFeaturedActivities(): Promise<Activity[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/public/activities?featured=true&limit=3&offset=0`, {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch activities');
+    }
+
+    const data = await response.json();
+    // Handle both old and new response formats
+    return Array.isArray(data) ? data.slice(0, 3) : (data.activities || []).slice(0, 3);
+  } catch (error) {
+    console.error('Error fetching featured activities:', error);
+    return [];
+  }
+}
 
 // Activity Card component
 function ActivityCard({
@@ -129,11 +154,8 @@ function ActivityCard({
   );
 }
 
-export default function Activities() {
-  // Get featured activities by IDs
-  const featuredActivities = activities.filter((activity) =>
-    FEATURED_IDS.includes(activity.id)
-  );
+export default async function Activities() {
+  const featuredActivities = await getFeaturedActivities();
 
   return (
     <section

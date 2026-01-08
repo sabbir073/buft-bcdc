@@ -4,9 +4,19 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { activities, Activity } from "@/data/activities";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+interface Activity {
+  id: number;
+  title: string;
+  date: string;
+  description: string;
+  location?: string | null;
+  featured: boolean;
+  images: string[];
+  imageCount: number;
+}
 
 // Lightbox component
 function Lightbox({
@@ -165,6 +175,7 @@ export default function ActivityDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [activity, setActivity] = useState<Activity | null>(null);
+  const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<{
     isOpen: boolean;
     images: string[];
@@ -176,9 +187,29 @@ export default function ActivityDetailPage() {
   });
 
   useEffect(() => {
-    const id = parseInt(params.id as string);
-    const foundActivity = activities.find((a) => a.id === id);
-    setActivity(foundActivity || null);
+    async function fetchActivity() {
+      setLoading(true);
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/public/activities/${params.id}`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setActivity(data);
+        } else {
+          setActivity(null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch activity:', error);
+        setActivity(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchActivity();
   }, [params.id]);
 
   const openGallery = (index: number) => {
@@ -193,11 +224,20 @@ export default function ActivityDetailPage() {
     document.body.style.overflow = "auto";
   };
 
-  // Get previous and next activities
-  const currentIndex = activities.findIndex((a) => a.id === activity?.id);
-  const prevActivity = currentIndex > 0 ? activities[currentIndex - 1] : null;
-  const nextActivity =
-    currentIndex < activities.length - 1 ? activities[currentIndex + 1] : null;
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+          <div className="text-center px-4">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading activity...</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   if (!activity) {
     return (
@@ -314,22 +354,49 @@ export default function ActivityDetailPage() {
                 <span className="text-white">{activity.title}</span>
               </div>
 
-              {/* Date badge */}
-              <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                {activity.date}
+              {/* Date and Location badges */}
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {activity.date}
+                </div>
+
+                {activity.location && (
+                  <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    {activity.location}
+                  </div>
+                )}
               </div>
 
               {/* Title */}
@@ -446,39 +513,7 @@ export default function ActivityDetailPage() {
           </div>
 
           {/* Navigation */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-200">
-            {/* Previous Activity */}
-            {prevActivity ? (
-              <Link
-                href={`/activities/${prevActivity.id}`}
-                className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors group"
-              >
-                <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <span className="text-sm text-gray-400">Previous</span>
-                  <p className="font-medium line-clamp-1 max-w-[200px]">
-                    {prevActivity.title}
-                  </p>
-                </div>
-              </Link>
-            ) : (
-              <div />
-            )}
-
+          <div className="flex items-center justify-center pt-8 border-t border-gray-200">
             {/* Back to Activities */}
             <Link
               href="/activities"
@@ -494,43 +529,11 @@ export default function ActivityDetailPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              All Activities
+              Back to All Activities
             </Link>
-
-            {/* Next Activity */}
-            {nextActivity ? (
-              <Link
-                href={`/activities/${nextActivity.id}`}
-                className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors group"
-              >
-                <div className="text-right">
-                  <span className="text-sm text-gray-400">Next</span>
-                  <p className="font-medium line-clamp-1 max-w-[200px]">
-                    {nextActivity.title}
-                  </p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              </Link>
-            ) : (
-              <div />
-            )}
           </div>
         </div>
       </main>

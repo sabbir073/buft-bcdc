@@ -21,6 +21,7 @@ export default function Footer() {
     { name: "Publications", href: "/publications" },
     { name: "Faculty Advisor", href: "/faculty-advisor" },
     { name: "Membership", href: "/membership" },
+    { name: "Contact", href: "/contact" },
   ];
 
   const socialLinks = [

@@ -30,6 +30,105 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ============================================ */
+/* CURSOR POINTER FOR ALL INTERACTIVE ELEMENTS */
+/* ============================================ */
+
+/* Buttons */
+button,
+[type="button"],
+[type="submit"],
+[type="reset"],
+.btn {
+  cursor: pointer !important;
+}
+
+/* Links */
+a,
+[role="link"] {
+  cursor: pointer !important;
+}
+
+/* Clickable elements */
+[onclick],
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+.clickable,
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+/* Form elements */
+select,
+option,
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"],
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]) {
+  cursor: pointer !important;
+}
+
+/* Navigation items */
+nav a,
+nav button,
+.nav-link,
+.menu-item {
+  cursor: pointer !important;
+}
+
+/* Interactive SVGs and icons */
+svg[onclick],
+svg[role="button"],
+.icon-button,
+.interactive-icon {
+  cursor: pointer !important;
+}
+
+/* Tabs and accordions */
+[role="tab"],
+[role="tabpanel"],
+.tab,
+.accordion-header,
+.accordion-button {
+  cursor: pointer !important;
+}
+
+/* Dropdown triggers */
+.dropdown-toggle,
+[data-toggle],
+[aria-expanded] {
+  cursor: pointer !important;
+}
+
+/* Card links and clickable cards */
+.card-link,
+.clickable-card,
+[data-href] {
+  cursor: pointer !important;
+}
+
+/* Close buttons */
+.close,
+.modal-close,
+[aria-label*="close"],
+[aria-label*="Close"] {
+  cursor: pointer !important;
+}
+
+/* Disabled state should show not-allowed */
+button:disabled,
+[disabled],
+[aria-disabled="true"],
+.disabled {
+  cursor: not-allowed !important;
+}
+
+/* ============================================ */
+/* SCROLLBAR STYLES */
+/* ============================================ */
+
 ::-webkit-scrollbar {
   width: 8px;
 }

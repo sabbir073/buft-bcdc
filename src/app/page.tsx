@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Activities from "@/components/Activities";
-import ExecutivePreview from "@/components/ExecutivePreview";
+import ExecutivePreview from "@/components/ExecutivePreviewWrapper";
 import CareerResources from "@/components/CareerResources";
 import JoinUs from "@/components/JoinUs";
 import Testimonials from "@/components/Testimonials";
